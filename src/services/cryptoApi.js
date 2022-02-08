@@ -20,15 +20,3 @@ export const cryptoApi = createApi({
 });
 
 export const { useGetCryptosQuery } = cryptoApi;
-
-// const options = {
-//   method: "GET",
-//   url:
-//   params: {
-//     referenceCurrencyUuid: "yhjMzLPhuIDl",
-//     limit: "50",
-//     offset: "0",
-//     orderBy: "24hVolume",
-//     orderDirection: "desc",
-//   },
-// };
