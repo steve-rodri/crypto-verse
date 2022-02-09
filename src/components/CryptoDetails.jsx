@@ -14,7 +14,11 @@ import {
   NumberOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
-import { useGetCryptoDetailsQuery } from "../services/cryptoApi";
+import {
+  useGetCryptoDetailsQuery,
+  useGetCryptoHistoryQuery,
+} from "../services/cryptoApi";
+import LineChart from "./LineChart";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -23,9 +27,15 @@ const CryptoDetails = () => {
   const { coinId } = useParams();
   const [timePeriod, setTimePeriod] = useState("7d");
   const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
+  const { data: coinHistory, isFetching: isFetchingHistory } =
+    useGetCryptoHistoryQuery({
+      coinId,
+      timePeriod,
+    });
   const cryptoDetails = data?.data?.coin;
   const time = ["3h", "24h", "7d", "30d", "1y", "3m", "3y", "5y"];
-  console.log(data);
+
+  if (isFetching) return "Loading...";
 
   const stats = [
     {
@@ -94,7 +104,6 @@ const CryptoDetails = () => {
       icon: <ExclamationCircleOutlined />,
     },
   ];
-  if (isFetching) return "Loading...";
   return (
     <Col className="coin-detail-container">
       <Col className="coin-heading-container">
@@ -117,15 +126,22 @@ const CryptoDetails = () => {
           <Option key={date}>{date}</Option>
         ))}
       </Select>
+      <LineChart
+        coinHistory={coinHistory}
+        currentPrice={millify(cryptoDetails.price)}
+        coinName={cryptoDetails.name}
+        isLoading={isFetchingHistory}
+        timePeriod={timePeriod}
+      />
       <Col className="stats-container">
         <Col className="coin-value-statistics">
           <Col className="coin-value-statistics-heading">
             <Title className="coin-details-heading" level={3}>
-              {cryptoDetails.name} value Statistics
+              {cryptoDetails.name} Statistics
             </Title>
             <p>An overview showing the stats of {cryptoDetails.name}</p>
-            {stats.map(({ icon, title, value }) => (
-              <Col className="coin-stats">
+            {stats.map(({ icon, title, value }, i) => (
+              <Col className="coin-stats" key={i}>
                 <Col className="coin-stats-name">
                   <Text>{icon}</Text>
                   <Text>{title}</Text>
@@ -141,8 +157,8 @@ const CryptoDetails = () => {
               Other Statistics
             </Title>
             <p>An overview showing the stats of all cryptocurrencies</p>
-            {genericStats.map(({ icon, title, value }) => (
-              <Col className="coin-stats">
+            {genericStats.map(({ icon, title, value }, i) => (
+              <Col className="coin-stats" key={i}>
                 <Col className="coin-stats-name">
                   <Text>{icon}</Text>
                   <Text>{title}</Text>
