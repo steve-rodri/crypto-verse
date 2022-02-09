@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import millify from "millify";
-import { Link } from "react-router-dom";
+import { Link, useOutlet, Outlet } from "react-router-dom";
 import { Card, Row, Col, Input } from "antd";
 
 import { useGetCryptosQuery } from "../services/cryptoApi.js";
 
 const Cryptocurrencies = ({ simplified }) => {
   const count = simplified ? 10 : 100;
+  const outlet = useOutlet();
   const { data: cryptosList, isFetching } = useGetCryptosQuery(count);
   const [cryptos, setCryptos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,9 +17,11 @@ const Cryptocurrencies = ({ simplified }) => {
     );
     setCryptos(filteredData);
   }, [cryptosList, searchTerm]);
+  if (outlet) return <Outlet />;
   if (isFetching) return "Loading...";
   return (
     <>
+      <Outlet />
       {!simplified && (
         <SearchField
           value={searchTerm}
@@ -42,7 +45,7 @@ const SearchField = props => (
 
 const CurrencyCard = ({ currency }) => (
   <Col xs={24} sm={12} lg={6} className="crypto-card" key={currency.uuid}>
-    <Link to={`/cryptocurrencies/${currency.symbol}`}>
+    <Link to={`/cryptocurrencies/${currency.uuid}`}>
       <Card
         title={`${currency.rank} ${currency.name}`}
         hoverable
