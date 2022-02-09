@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { coinRankingApi } from "../services/coinRankingApi";
-import { bingNewsApi } from "../services/bingNewsApi";
+import { bingNewsApi, coinRankingApi } from "../services";
 
 export default configureStore({
   reducer: {
