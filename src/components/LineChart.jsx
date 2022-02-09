@@ -13,6 +13,8 @@ import {
 } from "chart.js";
 import moment from "moment";
 
+import { useGetCryptoHistoryQuery } from "../services";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -23,11 +25,13 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ coinHistory, currentPrice, coinName, timePeriod }) => {
+const LineChart = ({ coinId, coinName, timePeriod, currentPrice }) => {
+  const params = { coinId, timePeriod };
+  const { data } = useGetCryptoHistoryQuery(params);
   const coinPrice = [];
   const coinTimestamp = [];
 
-  coinHistory?.data?.history?.forEach((_, i) => {
+  data?.data?.history?.forEach((_, i) => {
     coinPrice.push(coinHistory.data.history[i].price);
     if (timePeriod.match("h"))
       coinTimestamp.unshift(
