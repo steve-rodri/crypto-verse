@@ -1,34 +1,36 @@
-import React, { useState, useEffect } from "react";
-import millify from "millify";
 import { Link, useOutlet, Outlet } from "react-router-dom";
 import { Card, Row, Col, Input } from "antd";
+import { useState, useEffect } from "react";
 import Loader from "./Loader";
+import millify from "millify";
 
-import { useGetCryptosQuery } from "../services/cryptoApi.js";
+import { useGetCryptosQuery } from "../services";
 
 const Cryptocurrencies = ({ simplified }) => {
-  const count = simplified ? 10 : 100;
   const outlet = useOutlet();
-  const { data: cryptosList, isFetching } = useGetCryptosQuery(count);
-  const [cryptos, setCryptos] = useState([]);
+  const [cryptos, setCryptos] = useState();
   const [searchTerm, setSearchTerm] = useState("");
+  const { data, isFetching } = useGetCryptosQuery(simplified ? 10 : 100);
+
+  // filter cryptos based on searchTerm
   useEffect(() => {
-    const filteredData = cryptosList?.data?.coins.filter(coin =>
-      coin.name.toLowerCase().includes(searchTerm.toLowerCase())
+    setCryptos(
+      data?.data?.coins.filter(coin =>
+        coin.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     );
-    setCryptos(filteredData);
-  }, [cryptosList, searchTerm]);
+  }, [data, searchTerm]);
+
   if (outlet) return <Outlet />;
   if (isFetching) return <Loader />;
   return (
     <>
       <Outlet />
-      {!simplified && (
-        <SearchField
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-      )}
+      <SearchField
+        show={!simplified}
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+      />
       <Row gutter={[32, 32]} className="crypto-card-container">
         {cryptos?.map(currency => (
           <CurrencyCard currency={currency} />
@@ -38,11 +40,14 @@ const Cryptocurrencies = ({ simplified }) => {
   );
 };
 
-const SearchField = props => (
-  <div className="search-crypto">
-    <Input placeholder="Search Cryptocurrencies" {...props} />
-  </div>
-);
+const SearchField = ({ show, ...rest }) => {
+  if (!show) return null;
+  return (
+    <div className="search-crypto">
+      <Input placeholder="Search Cryptocurrencies" {...rest} />
+    </div>
+  );
+};
 
 const CurrencyCard = ({ currency }) => (
   <Col xs={24} sm={12} lg={6} className="crypto-card" key={currency.uuid}>
