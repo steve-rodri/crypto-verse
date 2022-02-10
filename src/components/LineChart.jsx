@@ -25,36 +25,32 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ coinId, coinName, timePeriod, currentPrice }) => {
-  const params = { coinId, timePeriod };
-  const { data } = useGetCryptoHistoryQuery(params);
-  const coinPrice = [];
-  const coinTimestamp = [];
+const reduceCoinHistory = (coinHistory, timePeriod) => {
+  if (!coinHistory?.data?.history) return [[], []];
+  return coinHistory.data.history.reduce(
+    (tuple, { price, timestamp }) => {
+      tuple[0].push(price);
+      timestamp = moment.unix(timestamp).toDate();
+      const hourly = timePeriod.match("h");
+      if (hourly) tuple[1].unshift(timestamp.toLocaleTimeString());
+      else tuple[1].unshift(timestamp.toLocaleDateString());
+      return tuple;
+    },
+    [[], []]
+  );
+};
 
-  data?.data?.history?.forEach((_, i) => {
-    coinPrice.push(coinHistory.data.history[i].price);
-    if (timePeriod.match("h"))
-      coinTimestamp.unshift(
-        moment
-          .unix(coinHistory.data.history[i].timestamp)
-          .toDate()
-          .toLocaleTimeString()
-      );
-    else
-      coinTimestamp.unshift(
-        moment
-          .unix(coinHistory.data.history[i].timestamp)
-          .toDate()
-          .toLocaleDateString()
-      );
-  });
+const LineChart = ({ coinId, timePeriod, ...rest }) => {
+  const params = { coinId, timePeriod };
+  const { data: coinHistory } = useGetCryptoHistoryQuery(params);
+  const [prices, timestamps] = reduceCoinHistory(coinHistory, timePeriod);
 
   const data = {
-    labels: coinTimestamp,
+    labels: timestamps,
     datasets: [
       {
         label: "Price in USD",
-        data: coinPrice,
+        data: prices,
         fill: false,
         backgroundColor: "#0071bd",
         borderColor: "#0071bd",
@@ -75,22 +71,26 @@ const LineChart = ({ coinId, coinName, timePeriod, currentPrice }) => {
   };
   return (
     <>
-      <Row className="chart-header">
-        <Typography.Title className="chart-title" level={2}>
-          {coinName} Price Chart
-        </Typography.Title>
-        <Col className="price-container">
-          <Typography.Title className="price-change" level={5}>
-            {coinHistory?.data?.change}%
-          </Typography.Title>
-          <Typography.Title className="current-price" level={5}>
-            Current {coinName} Price: ${currentPrice}
-          </Typography.Title>
-        </Col>
-      </Row>
+      <ChartHeader {...rest} change={coinHistory?.data?.change || 0} />
       <Line data={data} options={options} />
     </>
   );
 };
+
+const ChartHeader = ({ coinName, currentPrice, change }) => (
+  <Row className="chart-header">
+    <Typography.Title className="chart-title" level={2}>
+      {coinName} Price Chart
+    </Typography.Title>
+    <Col className="price-container">
+      <Typography.Title className="price-change" level={5}>
+        {change}%
+      </Typography.Title>
+      <Typography.Title className="current-price" level={5}>
+        Current {coinName} Price: ${currentPrice}
+      </Typography.Title>
+    </Col>
+  </Row>
+);
 
 export default LineChart;
