@@ -14,7 +14,7 @@ import {
 import { Col } from "antd";
 import millify from "millify";
 
-const CryptoDetails = () => {
+export const CryptoDetails = () => {
   const { coinId } = useParams();
   const [timePeriod, setTimePeriod] = useState("7d");
   const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
