@@ -33,7 +33,7 @@ export const TimePeriodSelect = ({ onChange }) => {
   );
 };
 
-export const CoinValueStatistics = cryptoDetails => {
+export const CoinValueStatistics = ({ cryptoDetails }) => {
   const stats = getCoinStats(cryptoDetails);
   return (
     <Col className="coin-value-statistics">

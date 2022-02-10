@@ -29,7 +29,7 @@ const reduceCoinHistory = (coinHistory, timePeriod) => {
   if (!coinHistory?.data?.history) return [[], []];
   return coinHistory.data.history.reduce(
     (tuple, { price, timestamp }) => {
-      tuple[0].push(price);
+      tuple[0].unshift(price);
       timestamp = moment.unix(timestamp).toDate();
       const hourly = timePeriod.match("h");
       if (hourly) tuple[1].unshift(timestamp.toLocaleTimeString());

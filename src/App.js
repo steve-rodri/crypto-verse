@@ -22,9 +22,9 @@ const App = () => {
       </div>
       <div className="main">
         <Main />
-      </div>
-      <div className="footer">
-        <Footer />
+        <div className="footer">
+          <Footer />
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
+import { useState, useEffect } from "react";
 import { Link, useOutlet, Outlet } from "react-router-dom";
 import { Card, Row, Col, Input } from "antd";
-import { useState, useEffect } from "react";
 import Loader from "./Loader";
 import millify from "millify";
 
@@ -25,7 +25,6 @@ const Cryptocurrencies = ({ simplified }) => {
   if (isFetching) return <Loader />;
   return (
     <>
-      <Outlet />
       <SearchField
         show={!simplified}
         value={searchTerm}
